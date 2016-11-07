@@ -1,0 +1,20 @@
+{
+    "name": "automata",
+    "version": "0.0.0",
+    "description": "Cellular automata",
+    "main": "index.js",
+    "scripts": {
+        "pretest": "npm run lint",
+        "test": "mocha test -u bdd -R spec",
+        "go": "nodejs index.js -s 12 -n 6 -i sasasas -p rules -t 12",
+        "lint": "jshint *.js **/*.js"
+    },
+    "author": "felixgb",
+    "license": "ISC",
+    "dependencies": {
+        "commander": "^2.9.0",
+        "jshint": "^2.9.4",
+        "mocha": "^3.1.2",
+        "should": "^11.1.1"
+    }
+}
