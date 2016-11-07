@@ -6,12 +6,13 @@
     "scripts": {
         "pretest": "npm run lint",
         "test": "mocha test -u bdd -R spec",
-        "go": "nodejs index.js -s 12 -n 6 -i sasasas -p rules -t 12",
+        "go": "nodejs index.js -s 10 -n 1 -i 0011010011 -p rule1.csv -t 10",
         "lint": "jshint *.js **/*.js"
     },
     "author": "felixgb",
     "license": "ISC",
     "dependencies": {
+        "babyparse": "^0.4.6",
         "commander": "^2.9.0",
         "jshint": "^2.9.4",
         "mocha": "^3.1.2",
