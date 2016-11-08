@@ -1,4 +1,10 @@
 {
- "esnext":"true",
- "noyield":"true"
+    "esnext":"true",
+    "noyield":"true",
+    "globalstrict": "true",
+    "node": "true",
+    "mocha": "true",
+    "globals": {
+      "console":false
+    }
 }
