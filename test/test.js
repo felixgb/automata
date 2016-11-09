@@ -59,3 +59,27 @@ describe("Test step", function() {
         automata.step(1, current, table).should.equal(next);
     });
 });
+
+describe("Test runAtomata", function() { 
+    it("matches a rule", function() {
+        let initial = "0011010011";
+        let table = {
+            "000": "0",
+            "001": "0",
+            "010": "0",
+            "011": "1",
+            "100": "0",
+            "101": "1",
+            "110": "1",
+            "111": "0"
+        };
+        let config = {
+            size: 10,
+            nsize: 1,
+            istate: initial,
+            ruleTable: table,
+            nsteps: 100000
+        };
+        automata.runAtomata(config);
+    });
+});

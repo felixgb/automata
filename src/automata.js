@@ -8,12 +8,16 @@ module.exports = {
 };
 
 function runAtomata(config) {
+    let runs = [];
     let current = config.istate;
 
     for (let i = 0; i < config.nsteps; i++) {
-        console.log(current);
+        // Do we want the initial state as well?
+        runs.push(current);
         current = step(config.nsize, current, config.ruleTable);
     }
+
+    return runs;
 }
 
 function step(nsize, current, ruleTable) {
@@ -32,8 +36,12 @@ function step(nsize, current, ruleTable) {
 function matchRule(current, ruleTable) {
     const next = ruleTable[current];
 
+
+    if (ruleTable === undefined) {
+        throw new Error("rule table undefined");
+    }
     if (next === undefined) {
-        throw "no rule matched!";
+        throw new Error("no rule matched! Pattern: |" + current + "|, rules: " +  ruleTable);
     } else {
         return next;
     }
