@@ -25,7 +25,7 @@ function step(nsize, current, ruleTable) {
 
     // pad string with empty neighbors
     for (let i = 0; i < nsize; i++) {
-        current = "0" + current + "0";
+        current = current[current.length - i - 1] + current + current[i];
     }
 
     return repeatTake(neighborhoodSize, current)

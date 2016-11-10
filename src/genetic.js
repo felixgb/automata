@@ -8,12 +8,14 @@ const SIZE = 10;
 const NUM_STEPS = 100;
 
 module.exports = {
+    Entry: Entry,
     cross: cross,
     fitness: fitness,
     sortByPhenotype: sortByPhenotype,
     newPopulation: newPopulation,
     makePatterns: makePatterns,
-    runGenetic: runGenetic
+    runGenetic: runGenetic,
+    getDesired: getDesired
 };
 
 function Entry(initial, geno, pheno) {
@@ -29,7 +31,7 @@ function cross(genotype1, genotype2) {
     return genotype1.slice(0, halfsize) + genotype2.slice(halfsize);
 }
 
-function generateGenotype(size) {
+function generateBitString(size) {
     const genotype = [];
 
     for (let i = 0; i < size; i++) {
@@ -40,9 +42,9 @@ function generateGenotype(size) {
     return genotype.join("");
 }
 
-function runPopulation(popMap) {
+function runPopulation(popMap, setup) {
     return popMap.map(function(row) {
-        const config = configFromGeno(row.geno, row.initial);
+        const config = configFromGeno(row.geno, row.initial, setup);
         const pheno = automata.runAtomata(config).slice(-1).pop();
         return Entry(row.initial, row.geno, pheno);
     });
@@ -55,14 +57,12 @@ function getDesired(cell) {
             on++;
         }
     }
-    return on >= (cell.length / 2) ? "1".repeat(SIZE) : "0".repeat(SIZE);
+    return on >= (cell.length / 2) ? "1".repeat(cell.length) : "0".repeat(cell.length);
 }
 
 function sortByPhenotype(populationResults) {
     populationResults.sort(function(a, b) {
-        const desiredA = getDesired(a.initial);
-        const desiredB = getDesired(b.initial);
-        return fitness(b.pheno, desiredB) - fitness(a.pheno, desiredA);
+        return fitness(b) - fitness(a);
     });
     return populationResults;
 }
@@ -70,29 +70,37 @@ function sortByPhenotype(populationResults) {
 function newPopulation(populationResults) {
     const sortedGenotypes = sortByPhenotype(populationResults);
     const newOffspring = cross(sortedGenotypes[0].geno, sortedGenotypes[1].geno);
-
-    // sortedGenotypes[sortedGenotypes.length - 2] = { initial: sortedGenotypes[sortedGenotypes.length - 2].initial, geno: generateGenotype(newOffspring.length) };
     const worst = sortedGenotypes.slice(-1).pop();
     sortedGenotypes[sortedGenotypes.length - 1] = Entry(worst.initial, newOffspring, worst.pheno);
+
     return sortedGenotypes;
 }
 
-function runGenetic(popsize) {
+function runGenetic(popSize, numSteps, nSize, cellSize, automataSteps) {
+    const setup = {
+        popSize: popSize,
+        numSteps: numSteps,
+        nSize: nSize,
+        cellSize: cellSize,
+        automataSteps: automataSteps
+    };
+    const genoSize = Math.pow(2, (nSize * 2 + 1));
+
     let pop = [];
 
-    for (let i = 0; i < popsize; i++) {
-        pop.push(Entry(generateGenotype(SIZE), generateGenotype(Math.pow(2, (NSIZE * 2 + 1))), ""));
+    for (let i = 0; i < popSize; i++) {
+        pop.push(Entry(generateBitString(cellSize), generateBitString(genoSize), ""));
     }
 
-    for (let i = 0; i < 100; i++) {
-        const popResults = runPopulation(pop);
+    for (let i = 0; i < numSteps; i++) {
+        const popResults = runPopulation(pop, setup);
         pop = newPopulation(popResults);
     }
 
     const table = new AsciiTable("Results");
-    table.setHeading("Initial", "Final Transition Rules", "Final");
-    runPopulation(pop).forEach(function(c) {
-        table.addRow(c.initial, c.geno, c.pheno);
+    table.setHeading("Initial", "Final Transition Rules", "Final", "Fitness");
+    runPopulation(pop, setup).forEach(function(c) {
+        table.addRow(c.initial, c.geno, c.pheno, fitness(c));
     });
     console.log(table.toString());
 }
@@ -119,8 +127,8 @@ function makePatterns(nsize) {
     return patterns;
 }
 
-function configFromGeno(genotype, initial) {
-    const patterns = makePatterns(NSIZE);
+function configFromGeno(genotype, initial, setup) {
+    const patterns = makePatterns(setup.nSize);
     const ruleTable = {};
 
     for (let i = 0; i < genotype.length; i++) {
@@ -128,17 +136,19 @@ function configFromGeno(genotype, initial) {
     }
 
     return {
-        size: SIZE,
-        nsize: NSIZE,
+        size: setup.cellSize,
+        nsize: setup.nSize,
         istate: initial,
         ruleTable: ruleTable,
-        nsteps: NUM_STEPS
+        nsteps: setup.automataSteps
     };
 }
 
-function fitness(pheno1, pheno2) {
-    // normalize to 0 - 1
-    return (pheno1.length - difference(pheno1, pheno2)) / pheno1.length;
+function fitness(row) {
+    const pheno = row.pheno;
+    const desired = getDesired(row.initial);
+    // normalize to 0 to 1
+    return (pheno.length - difference(pheno, desired)) / pheno.length;
 }
 
 // difference in two equally sized strings
@@ -153,5 +163,3 @@ function difference(str1, str2) {
 
     return numDifferences;
 }
-
-// runGenetic(10);

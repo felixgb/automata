@@ -15,13 +15,12 @@ describe("Test cross", function() {
 
 describe("Test fitness", function() { 
     it("gives 0 - 1 val for fitness", function() {
-        let bad = "11111111";
-        let ok = "00001111";
-        let good = "00000000";
-        let desired = "00000000";
-        genetic.fitness(bad, desired).should.equal(0);
-        genetic.fitness(ok, desired).should.equal(0.5);
-        genetic.fitness(good, desired).should.equal(1);
+        const bad = genetic.Entry("00000000", "00110011", "11111111");
+        const ok = genetic.Entry("00000000", "00110011", "00001111");
+        const good = genetic.Entry("00000000", "00110011", "00000000");
+        genetic.fitness(bad).should.equal(0);
+        genetic.fitness(ok).should.equal(0.5);
+        genetic.fitness(good).should.equal(1);
     });
 });
 
@@ -115,9 +114,23 @@ describe("Test makePatterns (with nsize 2", function() {
     });
 });
 
+describe("Test getDesired", function() { 
+    it("get the desired cell type", function() {
+        const a = "00000000";
+        const b = "11000000";
+        const c = "11111111";
+        const d = "010";
+
+        genetic.getDesired(a).should.equal("00000000");
+        genetic.getDesired(b).should.equal("00000000");
+        genetic.getDesired(c).should.equal("11111111");
+        genetic.getDesired(d).should.equal("000");
+    });
+});
+
 describe("Test runGenetic", function() { 
     it("runs the genetic function", function() {
         this.timeout(0);
-        genetic.runGenetic(10);
+        genetic.runGenetic(10, 100, 3, 10, 100);
     });
 });
