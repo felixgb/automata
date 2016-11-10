@@ -2,6 +2,7 @@
 
 ## Automata useage:
 
+```
 Usage: index [options]
 
 Simple cellular automata
@@ -15,5 +16,5 @@ Options:
 -i, --init-state <istate>        Initial state as a string of length size
 -p, --rules-path <path>          Path to rule table, rule table is a csv
 -t, --num-steps <nsteps>         Time steps to run for
-
+```
 
