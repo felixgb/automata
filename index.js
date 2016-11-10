@@ -3,7 +3,7 @@
 "use strict";
 
 const program = require("commander");
-const Papa = require("babyparse");
+const papa = require("babyparse");
 const fs = require("fs");
 
 const automata = require("./src/automata");
@@ -12,7 +12,7 @@ function loadRules(parsedArgs) {
     const path = parsedArgs.rulesPath;
     const content = fs.readFileSync(path, { encoding: "binary" });
 
-    Papa.parse(content, {
+    papa.parse(content, {
         skipEmptyLines: true,
         complete: function(res) {
             let config = makeConfig(res, parsedArgs);
@@ -28,10 +28,10 @@ function validate(config) {
     const rules = Object.keys(config.ruleTable);
 
     if (!rules.every(equalToNsize)) {
-        throw "Rule table row size does not match neighbor size";
+        throw new Error("Rule table row size does not match neighbor size");
     }
     if (rules.length != Math.pow(2, neighborhoodSize)) {
-        throw "Not enough rules for the given neighbor size!";
+        throw new Error("Not enough rules for the given neighbor size!");
     }
 }
 
@@ -67,6 +67,11 @@ function makeRuleTable(rules) {
         .option("-p, --rules-path <path>", "Path to rule table")
         .option("-t, --num-steps <nsteps>", "Time steps to run for")
         .parse(process.argv);
+
+    // 2 becuase node and the name of the program
+    if (process.argv.length <= 2) {
+        program.help();
+    }
 
     loadRules(program);
 })();

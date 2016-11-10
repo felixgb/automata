@@ -3,10 +3,6 @@
 const automata = require("./automata");
 const AsciiTable = require("ascii-table");
 
-const NSIZE = 3;
-const SIZE = 10;
-const NUM_STEPS = 100;
-
 module.exports = {
     Entry: Entry,
     cross: cross,
@@ -32,14 +28,14 @@ function cross(genotype1, genotype2) {
 }
 
 function generateBitString(size) {
-    const genotype = [];
+    const str = [];
 
     for (let i = 0; i < size; i++) {
         const min = Math.ceil(0);
         const max = Math.floor(1);
-        genotype.push(Math.floor(Math.random() * (max - min + 1)) + min);
+        str.push(Math.floor(Math.random() * (max - min + 1)) + min);
     }
-    return genotype.join("");
+    return str.join("");
 }
 
 function runPopulation(popMap, setup) {
