@@ -37,11 +37,8 @@ function matchRule(current, ruleTable) {
     const next = ruleTable[current];
 
 
-    if (ruleTable === undefined) {
-        throw new Error("rule table undefined");
-    }
     if (next === undefined) {
-        throw new Error("no rule matched! Pattern: |" + current + "|, rules: " +  ruleTable);
+        throw new Error("no rule matched!");
     } else {
         return next;
     }

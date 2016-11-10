@@ -5,8 +5,10 @@
 const program = require("commander");
 const papa = require("babyparse");
 const fs = require("fs");
+const AsciiTable = require("ascii-table");
 
 const automata = require("./src/automata");
+const genetic = require("./src/genetic");
 
 function loadRules(parsedArgs) {
     const path = parsedArgs.rulesPath;
@@ -17,9 +19,17 @@ function loadRules(parsedArgs) {
         complete: function(res) {
             let config = makeConfig(res, parsedArgs);
             validate(config);
-            automata.runAtomata(config);
+            tabularizeAndPrint(automata.runAtomata(config));
         }
     });
+}
+
+function tabularizeAndPrint(rows) {
+    const table = new AsciiTable("Results");
+    rows.forEach(function(r) {
+        table.addRow(r);
+    });
+    console.log(table.toString());
 }
 
 function validate(config) {
@@ -59,19 +69,36 @@ function makeRuleTable(rules) {
 
 (function main() {
     program
-        .version('0.0.1')
+        .version('0.0.1');
+
+    program
+        .command("automata")
         .description("Simple cellular automata")
         .option("-s, --size <size>","Size of the automata")
         .option("-n, --neighborhood-size <nsize>", "Neighborhood size")
         .option("-i, --init-state <istate>", "Initial state")
         .option("-p, --rules-path <path>", "Path to rule table")
         .option("-t, --num-steps <nsteps>", "Time steps to run for")
-        .parse(process.argv);
+        .action(function(opts) {
+            loadRules(opts);
+        });
+
+    program
+        .command("genetic")
+        .description("Genetic cellular automata")
+        .option("-z, --pop-size <popsize>","Initial population size")
+        .option("-s, --cell-size <size>","Size of the automata")
+        .option("-n, --neighborhood-size <nsize>", "Neighborhood size")
+        .option("-g, --gen-steps <gensteps>", "Number of generations to rule for")
+        .option("-a, --num-steps <nsteps>", "Time steps to run automata for")
+        .action(function(opts) {
+            genetic.runGenetic(opts.popSize, opts.genSteps, opts.neighborhoodSize, opts.cellSize, opts.numSteps);
+        });
 
     // 2 becuase node and the name of the program
     if (process.argv.length <= 2) {
         program.help();
+    } else {
+        program.parse(process.argv);
     }
-
-    loadRules(program);
 })();
